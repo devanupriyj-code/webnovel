@@ -1,8 +1,11 @@
 const express = require("express");
 const authMiddleware = require("../middleware/auth");
+
 const { PrismaClient } = require("@prisma/client");
 const { Pool } = require("pg");
 const { PrismaPg } = require("@prisma/adapter-pg");
+
+const router = express.Router();
 
 // 🔹 Prisma setup
 const pool = new Pool({
@@ -12,9 +15,6 @@ const pool = new Pool({
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// 🔹 Router
-const router = express.Router();
-
 
 // ➕ Add new novel
 router.post("/add", authMiddleware, async (req, res) => {
@@ -22,10 +22,7 @@ router.post("/add", authMiddleware, async (req, res) => {
     const { title, description } = req.body;
 
     const novel = await prisma.novel.create({
-      data: {
-        title,
-        description,
-      },
+      data: { title, description },
     });
 
     res.json(novel);
@@ -36,17 +33,13 @@ router.post("/add", authMiddleware, async (req, res) => {
 });
 
 
-// ➕ Add chapter (FIXED POSITION)
+// ➕ Add chapter
 router.post("/chapter/add", authMiddleware, async (req, res) => {
   try {
     const { title, content, novelId } = req.body;
 
     const chapter = await prisma.chapter.create({
-      data: {
-        title,
-        content,
-        novelId,
-      },
+      data: { title, content, novelId },
     });
 
     res.json(chapter);
@@ -69,7 +62,7 @@ router.get("/", async (req, res) => {
 });
 
 
-// 📄 Get chapters
+// 📄 Get chapters of a novel
 router.get("/:id/chapters", async (req, res) => {
   try {
     const chapters = await prisma.chapter.findMany({
@@ -102,6 +95,4 @@ router.get("/chapter/:id", async (req, res) => {
   }
 });
 
-
-// 🔹 EXPORT MUST BE LAST
 module.exports = router;
