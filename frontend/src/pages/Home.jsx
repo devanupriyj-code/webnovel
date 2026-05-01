@@ -1,23 +1,11 @@
 import { useEffect, useState } from "react";
 import api from "../api";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [novels, setNovels] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  const token = localStorage.getItem("token");
-
-  // 🔐 Decode user safely
-  let user = null;
-  if (token) {
-    try {
-      user = JSON.parse(atob(token.split(".")[1]));
-    } catch (err) {
-      user = null;
-    }
-  }
 
   useEffect(() => {
     api.get("/novels")
@@ -31,81 +19,55 @@ function Home() {
       });
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-  };
-
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="loading">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div className="home-container">
 
-      {/* 🔥 NAVBAR */}
-      <div className="navbar">
-        <h2 className="logo">📚 Webnovels</h2>
-
-        <div className="nav-actions">
-          {!token ? (
-            <>
-              <Link to="/login" className="btn-outline">Login</Link>
-              <Link to="/register" className="btn-primary">Register</Link>
-            </>
-          ) : (
-            <>
-              {/* 👑 ADMIN BUTTON */}
-              {user?.role === "ADMIN" && (
-                <button
-                  onClick={() => navigate("/admin")}
-                  className="btn-primary"
-                >
-                  Admin Panel
-                </button>
-              )}
-
-              <button
-                onClick={() => navigate("/add-novel")}
-                className="btn-primary"
-              >
-                + Add Novel
-              </button>
-
-              <button onClick={handleLogout} className="btn-outline">
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* 🔥 HEADER */}
+      {/* 🔥 HERO SECTION */}
       <div className="hero-section">
         <h1>Discover Amazing Stories</h1>
         <p>Read and explore web novels from creators around the world.</p>
       </div>
 
-      {/* 🔥 NOVELS */}
-      <div className="novel-grid">
-        {novels.length === 0 && <p>No novels available</p>}
+      {/* 🔥 EMPTY STATE */}
+      {novels.length === 0 && (
+        <p style={{ textAlign: "center", marginTop: "20px" }}>
+          No novels available
+        </p>
+      )}
 
+      {/* 🔥 NOVEL GRID */}
+      <div className="novel-grid">
         {novels.map((novel) => (
           <div
             key={novel.id}
             className="novel-card"
             onClick={() => navigate(`/novel/${novel.id}`)}
           >
+            {/* 🎨 CARD IMAGE */}
             <div className="card-image"></div>
 
+            {/* 📄 CARD CONTENT */}
             <div className="card-content">
               <h2>{novel.title}</h2>
               <p>{novel.description}</p>
-              <p style={{ color: "#94a3b8", fontSize: "14px" }}>
-  👁️ {novel.views} views
-</p>
 
-              <button className="read-btn">Read →</button>
+              {/* 👁️ VIEWS */}
+              <p style={{ color: "#94a3b8", fontSize: "14px" }}>
+                👁️ {novel.views || 0} views
+              </p>
+
+              {/* 🔘 BUTTON */}
+              <button className="read-btn">
+                Read →
+              </button>
             </div>
           </div>
         ))}
