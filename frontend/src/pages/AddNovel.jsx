@@ -7,43 +7,57 @@ function AddNovel() {
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleAdd = async () => {
     try {
-      await api.post("/novels/add", {
-        title,
-        description,
-      });
+      const token = localStorage.getItem("token");
 
-      alert("Novel added!");
+      await api.post(
+        "/novels/add",
+        {
+          title,
+          description,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+
+      alert("Novel added successfully");
       navigate("/");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       alert("Error adding novel");
     }
   };
 
   return (
     <div style={{
-      padding: "20px",
+      padding: "30px",
       background: "#0f172a",
-      color: "white",
-      minHeight: "100vh"
+      minHeight: "100vh",
+      color: "white"
     }}>
-      <h1>Add Novel</h1>
+      <h1>Add New Novel</h1>
 
       <input
         placeholder="Title"
+        value={title}
         onChange={(e) => setTitle(e.target.value)}
+        style={{ display: "block", marginBottom: "10px", padding: "10px", width: "300px" }}
       />
-      <br /><br />
 
       <textarea
         placeholder="Description"
+        value={description}
         onChange={(e) => setDescription(e.target.value)}
+        style={{ display: "block", marginBottom: "10px", padding: "10px", width: "300px" }}
       />
-      <br /><br />
 
-      <button onClick={handleSubmit}>Submit</button>
+      <button onClick={handleAdd}>
+        Add Novel
+      </button>
     </div>
   );
 }
