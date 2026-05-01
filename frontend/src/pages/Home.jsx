@@ -9,6 +9,16 @@ function Home() {
 
   const token = localStorage.getItem("token");
 
+  // 🔐 Decode user safely
+  let user = null;
+  if (token) {
+    try {
+      user = JSON.parse(atob(token.split(".")[1]));
+    } catch (err) {
+      user = null;
+    }
+  }
+
   useEffect(() => {
     api.get("/novels")
       .then(res => {
@@ -45,9 +55,23 @@ function Home() {
             </>
           ) : (
             <>
-              <button onClick={() => navigate("/add-novel")} className="btn-primary">
+              {/* 👑 ADMIN BUTTON */}
+              {user?.role === "ADMIN" && (
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="btn-primary"
+                >
+                  Admin Panel
+                </button>
+              )}
+
+              <button
+                onClick={() => navigate("/add-novel")}
+                className="btn-primary"
+              >
                 + Add Novel
               </button>
+
               <button onClick={handleLogout} className="btn-outline">
                 Logout
               </button>
@@ -68,19 +92,22 @@ function Home() {
 
         {novels.map((novel) => (
           <div
-  key={novel.id}
-  className="novel-card"
-  onClick={() => navigate(`/novel/${novel.id}`)}
->
-  <div className="card-image"></div>
+            key={novel.id}
+            className="novel-card"
+            onClick={() => navigate(`/novel/${novel.id}`)}
+          >
+            <div className="card-image"></div>
 
-  <div className="card-content">
-    <h2>{novel.title}</h2>
-    <p>{novel.description}</p>
+            <div className="card-content">
+              <h2>{novel.title}</h2>
+              <p>{novel.description}</p>
+              <p style={{ color: "#94a3b8", fontSize: "14px" }}>
+  👁️ {novel.views} views
+</p>
 
-    <button className="read-btn">Read →</button>
-  </div>
-</div>
+              <button className="read-btn">Read →</button>
+            </div>
+          </div>
         ))}
       </div>
     </div>

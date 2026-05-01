@@ -59,16 +59,25 @@ router.post("/login", async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
+    console.log("LOGIN USER:", user);
 
     if (!user) return res.status(400).json("User not found");
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json("Wrong password");
 
+    console.log("TOKEN PAYLOAD:", {
+  id: user.id,
+  role: user.role
+});
     const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET
-    );
+  { 
+    id: user.id,
+    role: user.role   // 👈 IMPORTANT
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: "1d" }
+);
 
     res.json({ token });
   } catch (error) {

@@ -11,12 +11,14 @@ model User {
   username String
   email    String @unique
   password String
+  role     String @default("USER")
 }
 
 model Novel {
   id        Int       @id @default(autoincrement())
   title     String
   description String
+  views       Int       @default(0)
   chapters  Chapter[]
 }
 

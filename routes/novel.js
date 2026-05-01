@@ -1,6 +1,6 @@
 const express = require("express");
 const authMiddleware = require("../middleware/auth");
-
+const admin = require("../middleware/admin");
 const { PrismaClient } = require("@prisma/client");
 const { Pool } = require("pg");
 const { PrismaPg } = require("@prisma/adapter-pg");
@@ -31,7 +31,18 @@ router.post("/add", authMiddleware, async (req, res) => {
     res.status(500).json("Error adding novel");
   }
 });
+router.delete("/delete/:id", admin, async (req, res) => {
+  try {
+    await prisma.novel.delete({
+      where: { id: parseInt(req.params.id) }
+    });
 
+    res.json({ msg: "Novel deleted" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Error deleting novel");
+  }
+});
 
 // ➕ Add chapter
 router.post("/chapter/add", authMiddleware, async (req, res) => {
@@ -53,7 +64,11 @@ router.post("/chapter/add", authMiddleware, async (req, res) => {
 // 📚 Get all novels
 router.get("/", async (req, res) => {
   try {
-    const novels = await prisma.novel.findMany();
+    const novels = await prisma.novel.findMany({
+  orderBy: {
+    views: "desc"
+  }
+});
     res.json(novels);
   } catch (error) {
     console.log(error);
@@ -83,12 +98,25 @@ router.get("/:id/chapters", async (req, res) => {
 router.get("/chapter/:id", async (req, res) => {
   try {
     const chapter = await prisma.chapter.findUnique({
-      where: {
-        id: parseInt(req.params.id),
-      },
+      where: { id: parseInt(req.params.id) }
+    });
+
+    if (!chapter) {
+      return res.status(404).json("Chapter not found");
+    }
+
+    // 👁️ INCREMENT VIEWS
+    await prisma.novel.update({
+      where: { id: chapter.novelId },
+      data: {
+        views: {
+          increment: 1
+        }
+      }
     });
 
     res.json(chapter);
+
   } catch (error) {
     console.log(error);
     res.status(500).json("Error fetching chapter");

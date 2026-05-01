@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Novel" ADD COLUMN     "views" INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "role" TEXT NOT NULL DEFAULT 'USER';
