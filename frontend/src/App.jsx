@@ -5,6 +5,7 @@ import ChapterRead from "./pages/ChapterRead";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AddNovel from "./pages/AddNovel";
+import './App.css';
 function App() {
   return (
     <Routes>

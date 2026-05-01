@@ -7,7 +7,6 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 🔐 check login
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -24,80 +23,64 @@ function Home() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    alert("Logged out");
     window.location.reload();
   };
 
   if (loading) {
-    return (
-      <div style={{ color: "white", background: "#0f172a", minHeight: "100vh" }}>
-        Loading...
-      </div>
-    );
+    return <div className="loading">Loading...</div>;
   }
 
   return (
-    <div style={{
-      padding: "20px",
-      background: "#0f172a",
-      minHeight: "100vh",
-      color: "white"
-    }}>
-      
+    <div className="home-container">
+
       {/* 🔥 NAVBAR */}
-      <div style={{ marginBottom: "20px" }}>
-        {!token ? (
-          <>
-            <Link to="/login" style={{ marginRight: "10px" }}>Login</Link>
-            <Link to="/register">Register</Link>
-          </>
-        ) : (
-          <>
-            <button onClick={handleLogout}>Logout</button>
-          </>
-        )}
-        {token && (
-  <>
-    <button onClick={() => navigate("/add-novel")}>
-      Add Novel
-    </button>
-    <button onClick={handleLogout}>Logout</button>
-  </>
-)}
+      <div className="navbar">
+        <h2 className="logo">📚 Webnovels</h2>
+
+        <div className="nav-actions">
+          {!token ? (
+            <>
+              <Link to="/login" className="btn-outline">Login</Link>
+              <Link to="/register" className="btn-primary">Register</Link>
+            </>
+          ) : (
+            <>
+              <button onClick={() => navigate("/add-novel")} className="btn-primary">
+                + Add Novel
+              </button>
+              <button onClick={handleLogout} className="btn-outline">
+                Logout
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      <h1 style={{ fontSize: "32px", marginBottom: "20px" }}>
-        📚 Webnovels
-      </h1>
+      {/* 🔥 HEADER */}
+      <div className="hero-section">
+        <h1>Discover Amazing Stories</h1>
+        <p>Read and explore web novels from creators around the world.</p>
+      </div>
 
-      {/* 🔥 EMPTY STATE */}
-      {novels.length === 0 && <p>No novels available</p>}
+      {/* 🔥 NOVELS */}
+      <div className="novel-grid">
+        {novels.length === 0 && <p>No novels available</p>}
 
-      {/* 🔥 NOVEL LIST */}
-      <div style={{ display: "grid", gap: "20px" }}>
         {novels.map((novel) => (
           <div
-            key={novel.id}
-            onClick={() => navigate(`/novel/${novel.id}`)}
-            style={{
-              background: "#1e293b",
-              padding: "20px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              transition: "0.3s"
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "#334155")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "#1e293b")
-            }
-          >
-            <h2>{novel.title}</h2>
-            <p style={{ color: "#94a3b8" }}>
-              {novel.description}
-            </p>
-          </div>
+  key={novel.id}
+  className="novel-card"
+  onClick={() => navigate(`/novel/${novel.id}`)}
+>
+  <div className="card-image"></div>
+
+  <div className="card-content">
+    <h2>{novel.title}</h2>
+    <p>{novel.description}</p>
+
+    <button className="read-btn">Read →</button>
+  </div>
+</div>
         ))}
       </div>
     </div>
